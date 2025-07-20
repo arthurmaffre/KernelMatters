@@ -37,9 +37,8 @@ In KEPs, external $G' \sim M(G, H)$—Poisson arrivals ($\lambda=5$), Bernoulli 
 
 Flow inconsistency: Forward marginal $P_T(H) = \int P_F(\tau_H) d\tau_H$ (intra-round deterministic). Post, $s' = (G', \emptyset) \sim M$ disperses downstream $R_{t+1}$, yet upstream $P_F$ blind. True target: $P^*(\tau) \propto \prod_t R(H_t) \prod_t P(s_{t+1} \mid (s_t, H_t))$; standard optimizes $\prod_t R(H_t)$, Kullback-Leibler
 
-$$
-D_{KL}(P^* \| P_T) = \mathbb{E}_{P^*} \left[ \sum_t \log P(s_{t+1} \mid (s_t, H_t)) \right] > 0,
-$$
+$D_{KL}(P^* || P_T) = E_{P^*}[log P(s_{t+1} | (s_t, H_t))] > 0$
+
 
 unless $P = \delta$ (deterministic)—impossible. Gap swells with branching: entropy $\mathbb{H}[P(\cdot \mid (s, H))]$ biases toward low-entropy greed.
 
