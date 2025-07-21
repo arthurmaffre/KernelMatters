@@ -1,9 +1,8 @@
-
 # Stochastic GFlowNets for Kidney Exchange Programs: A Critical Extension
 
 ## Overview
 
-This repository provides a focused critique and extension of static Generative Flow Networks (GFlowNets) applied to stochastic Kidney Exchange Programs (KEPs), as analyzed in St-Arnaud et al. (2025). By integrating Stochastic GFlowNets (Pan et al., 2023), we address inherent limitations in deterministic flow models under Markovian transitions, demonstrating through mathematical dissection how unmodeled stochasticity biases marginals, fairness metrics, and long-term expectations. The goal is to foster rigorous probabilistic fidelity in high-stakes combinatorial optimization, where approximations must confront the full entropy of real-world dynamics.
+By integrating Stochastic GFlowNets (Pan et al., 2023), we address inherent limitations in deterministic flow models under Markovian transitions in KEP, demonstrating through mathematical dissection how unmodeled stochasticity biases marginals, fairness metrics, and long-term expectations. The goal is to foster rigorous probabilistic fidelity in high-stakes combinatorial optimization, where approximations must confront the full entropy of real-world dynamics.
 
 ## Purpose and Contributions
 
@@ -46,11 +45,31 @@ Gradient variance: TB $\nabla L_{TB} \sim \sum_i \nabla \log P_F \cdot (\log Z +
 
 Stochastic rectifies: even-odd decomposition,
 
-$$F(s) \pi(a \mid s) P(s' \mid (s, a)) = F(s') \pi_B((s, a) \mid s')$$,
+$$F(s) \pi(a \mid s) P(s' \mid (s, a)) = F(s') \pi_B((s, a) \mid s')$$
+
 
 loss with $\hat{P} \approx M$ via MLE. Bias dissolves: $\log P$ aligns $P_T \to P^*$, $D_{KL} \to 0$.
 
 Toy: Static $P_T(H_2)/P_T(H_1) = e^{-1} \approx 0.37$; true $\mathbb{E}[\sum \mid H_2] > \mathbb{E}[\sum \mid H_1]$. Iterate: greed traps low-entropy, variance $\to \infty$—lattice crumbles.
+
+## Experiment: Demonstrating Collapse in Stochastic Environments (v1)
+
+To illustrate the problem highlighted in the mathematical analysis, I've added a preliminary experiment inspired by the stochastic chain environment from Pan et al. (2023). This serves as a proof-of-concept to show how standard GFlowNets falter in stochastic settings, while the stochastic variant holds up. It's a simple chain where you start at state 0 and can either "stop" (terminate with reward at current state) or "continue" (move forward with probability p=0.5 or stay put with 0.5). The reward function is bimodal, with peaks around N/4 and 3N/4, making it a good test for capturing multiple modes without collapse.
+
+In this env, the standard GFlowNet treats transitions as deterministic, ignoring the probabilistic branching. As N (chain length) grows, unmodeled stochasticity injects noise into the gradients, leading to higher variance, biased marginals, and eventual mode collapse— the model favors low-entropy paths, missing the true distribution. You see the KL divergence (measuring how far the sampled distribution is from the true posterior) spike for the standard version, while the stochastic one, which explicitly includes P(s' | s, a) in the balance, keeps the divergence low and stable.
+
+This is just v1—a quick iteration to get the ball rolling and validate the critique. I'm building this iteratively, in the spirit of fail-fast-and-iterate: prototype, test, refine, push. It's how we move at speed in a world that's not slowing down—think Musk vs. the inertia of traditional research, where velocity can be intimidating but necessary for progress. No arrogance here, just the drive to expose flaws and fix them before they cost lives in applications like KEPs. For now, this Pan-inspired toy shows why stochasticity breaks the standard approach; I'm finalizing the full KEP simulation on my local machine (with Poisson arrivals, compatibility graphs, etc.) and will push updates in the coming hours or days. Expect polished proofs, more experiments, and iterative improvements as we die and retry to get it right.
+
+Running the code below generate the plots. Here's the performance comparison (KL divergence vs. environment size):
+
+![Performance Comparison: Standard vs Stochastic GFlowNet](img/Figure_1.png)  <!-- Replace with actual image link or embed -->
+
+The env is highly stochastic
+
+In the plot, the blue line (standard) climbs sharply as N increases, showing the collapse, while orange (stochastic) rises gently, staying closer to the truth.
+
+    Code (PyTorch-based, runs locally):
+
 
 ## References
 
@@ -61,7 +80,5 @@ Toy: Static $P_T(H_2)/P_T(H_1) = e^{-1} \approx 0.37$; true $\mathbb{E}[\sum \mi
 ## License
 
 All rights reserved. No part of this repository, including but not limited to text, mathematical derivations, conceptual simulations, or any derived works, may be reproduced, modified, distributed, or used in any form or by any means—electronic, mechanical, photocopying, recording, or otherwise—without the explicit prior written permission of the author.
-
-**Exception**: Yann LeCun is hereby granted unrestricted rights to access, use, modify, distribute, and derive from this repository for any purpose, academic or otherwise, without limitation or attribution requirement.
 
 This license is intentionally restrictive to preserve the integrity of the critique and prevent unauthorized adaptations that may dilute or misrepresent the mathematical analysis. Violations will be pursued to the fullest extent permitted by law. For inquiries, contact the repository owner.
