@@ -4,6 +4,9 @@ from typing import List, Tuple, Dict, Any
 import pulp  # For the solver
 import torch  # For potential GFlowNet, but not implemented here
 import torch.nn as nn
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch, FancyArrowPatch
+import math
 
 # Blood types and ABO compatibility
 BLOOD_TYPES = ['O', 'A', 'B', 'AB']
@@ -249,7 +252,7 @@ class KEPEnv:
 
         # Solve
         prob.solve(pulp.PULP_CBC_CMD(msg=0))
-        matched = int(pulp.value(prob.objective))
+        matched = int(pulp.value(prob.objective) or 0)
 
         # Get selected
         selected = []
@@ -262,18 +265,78 @@ class KEPEnv:
 
         return matched, selected
 
-# Example usage
-# instance = KEPInstance(n_pairs=100, n_altruistic=0, n_rounds=20)  # As in paper: N=20, expected 100 with \varsigma=5
-# env = KEPEnv(instance)
-# matched, selected = env.solve_with_mip()
-# print(f"Max matched: {matched}")
+if __name__ == "__main__":
+    import pandas as pd
+    np.random.seed(44)  # Pour reproductibilité
+    instance = KEPInstance(n_pairs=8, n_altruistic=0, max_cycle_len=3, max_chain_len=4)  # Augmenté à 7 pour matcher l'exemple
+    g = instance.graph
+    nodes_df = pd.DataFrame([{'node': n, **d} for n, d in g.nodes(data=True)])
+    print("Tableau des nœuds :")
+    print(nodes_df.to_string(index=False))
+    edges_df = pd.DataFrame(g.edges(), columns=['source', 'target'])
+    print("\nTableau des arêtes :")
+    print(edges_df.to_string(index=False))
+    env = KEPEnv(instance)
+    matched, selected = env.solve_with_mip()
+    print(f"\nNombre maximum de paires appariées : {matched}")
+    print("Cycles/chaînes sélectionnés :")
+    for s in selected:
+        print(s)
 
-# Explications :
-# - Le pipeline génère uniquement des paires incompatibles, car ce sont celles qui rejoignent l'échange.
-# - Pour une paire : si ABO compatible, il y a prob cPRA d'être incompatible HLA (positive crossmatch), donc on garde avec cette prob.
-# - Si ABO incompatible : toujours garder.
-# - cPRA maintenant discret : 5%, 45%, 90% avec probs 70%, 20%, 10% approx.
-# - Edges : ABO ok ET prob 1-cPRA (negative crossmatch).
-# - Multi-rounds optionnel, mais équivalent pour graphe statique.
-# - Pas d'altruistes par défaut, comme dans le papier.
-# - Pour GFlowNet : utilise l'env pour sampler trajectories, train un modèle pour prédire actions maximisant la reward (matching maximal).
+    # Visualisation améliorée pour publication : flèches arrêtées au bord des nœuds, marges élargies, design clean
+    print("\nGénération du graphe visuel...")
+    plt.rcParams['font.family'] = 'sans-serif'  # Police sans-serif pour un look moderne
+    plt.rcParams['font.sans-serif'] = ['Arial', 'Helvetica']  # Priorité à Arial (Apple-like)
+    plt.rcParams['font.size'] = 12  # Taille de police de base
+
+    pos = nx.spring_layout(g, seed=42, k=0.6, iterations=100)  # Augmenté k pour plus d'espacement
+
+    patient_color_map = {
+        'O': '#FF6B6B',  # Corail doux
+        'A': '#4ECDC4',  # Bleu-vert clair
+        'B': '#45B7AF',  # Vert menthe
+        'AB': '#FFD97D'  # Jaune doux
+    }
+    node_colors = [patient_color_map.get(data['patient_bt'], '#CCCCCC') for node, data in g.nodes(data=True)]
+    labels = {n: f"{n}\n{data['patient_bt']}/{data['donor_bt']}\ncPRA: {data['cPRA']:.2f}" for n, data in g.nodes(data=True)}
+
+    fig, ax = plt.subplots(figsize=(16, 12))  # Taille augmentée pour plus d'espace et éviter l'écrasement
+    ax.margins(0.15)  # Marges élargies pour un design aéré
+
+    # Calcul du rayon des nœuds (node_size est l'aire en points^2)
+    node_size = 3500
+    radius = math.sqrt(node_size / math.pi)
+
+    # Dessin manuel des arêtes avec FancyArrowPatch pour shrinkB = radius (flèches s'arrêtent au bord)
+    for u, v in g.edges():
+        # Déterminer la courbure seulement si arête mutuelle pour séparer les flèches et visualiser les cycles
+        rad = 0.0
+        if g.has_edge(v, u):
+            rad = 0.25 if u < v else -0.25  # Courbure opposée pour arêtes mutuelles
+        conn_style = f'arc3,rad={rad}' if rad != 0 else None
+
+        arrow = FancyArrowPatch(pos[u], pos[v],
+                                connectionstyle=conn_style,
+                                arrowstyle='->',
+                                mutation_scale=25,  # Taille de la flèche
+                                linewidth=1.5,
+                                color='#333333',
+                                alpha=0.8,
+                                shrinkA=0,  # Pas de rétrécissement au départ
+                                shrinkB=radius + 2,  # Rétrécissement à l'arrivée pour arrêter au bord (+ marge)
+                                )
+        ax.add_patch(arrow)
+
+    # Dessin des nœuds par-dessus les arêtes (mais comme shrinkB est appliqué, pas besoin de couvrir)
+    nx.draw_networkx_nodes(g, pos, node_color=node_colors, node_size=node_size, alpha=0.95, edgecolors='white', linewidths=2, ax=ax)
+    nx.draw_networkx_labels(g, pos, labels, font_size=11, font_weight='bold', ax=ax)
+
+    # Légende pour les couleurs (positionnée en bas à droite, sans cadre pour minimalisme)
+    legend_elements = [Patch(facecolor=patient_color_map[bt], label=f'{bt}') for bt in patient_color_map]
+    ax.legend(handles=legend_elements, title='Type sanguin du patient', loc='lower right', frameon=False, fontsize=11, title_fontsize=12)
+
+    ax.set_title("Graphe d'Échange de Reins (KEP)\nNœuds colorés par type sanguin du patient", fontsize=18, fontweight='bold', pad=30)
+    ax.axis('off')  # Pas d'axes pour un look minimaliste
+    fig.patch.set_facecolor('white')  # Fond blanc
+    plt.tight_layout(pad=3.0)  # Espacement élargi pour éviter l'écrasement
+    plt.show()

@@ -52,6 +52,26 @@ loss with $\hat{P} \approx M$ via MLE. Bias dissolves: $\log P$ aligns $P_T \to 
 
 Toy: Static $P_T(H_2)/P_T(H_1) = e^{-1} \approx 0.37$; true $\mathbb{E}[\sum \mid H_2] > \mathbb{E}[\sum \mid H_1]$. Iterate: greed traps low-entropy, variance $\to \infty$—lattice crumbles.
 
+## KEP Environment Simulation
+
+The core KEP environment simulates a kidney exchange program with incompatible patient-donor pairs and optional altruistic donors. Key features include:
+
+Pair Generation: Incompatible pairs are generated based on blood type distributions (O: 48.14%, A: 33.73%, B: 14.28%, AB: 3.85%) and cPRA levels (low: 0.05 with 70.19% prob, medium: 0.45 with 20%, high: 0.90 with 9.81%). ABO compatibility is checked, with crossmatch failures simulated for compatible pairs.
+Graph Construction: A directed graph where nodes represent pairs (patient/donor blood types, cPRA) or altruists (donor blood type only). Edges represent compatibility (ABO match + negative crossmatch).
+Multi-Round Simulation: Pairs arrive over rounds via Poisson process (optional; equivalent to single round for static graphs in this setup).
+Cycle and Chain Detection: Identifies cycles (up to max length, e.g., 3) and chains starting from altruists (up to max length, e.g., 4).
+MIP Solver: Uses integer programming to maximize transplants by selecting disjoint cycles/chains.
+Environment Interface: Provides a stateful environment for stepwise actions (select cycle/chain or terminate), tracking remaining graph and matched pairs. Rewards are exponential in matched pairs upon maximal termination.
+Example output for a small instance (8 pairs, no altruists):
+
+![KEP Env Figure](img/Figure_2.png)
+
+Nodes table with IDs, types, blood types, cPRA.
+Edges table listing source-target compatibilities.
+Maximum matched pairs (e.g., via MIP).
+Selected cycles/chains.
+Visualization shows nodes colored by patient blood type (O: red, A: cyan, B: green, AB: yellow), with directed edges for compatibilities.
+
 ## Experiment: Demonstrating Collapse in Stochastic Environments (v1)
 
 To illustrate the problem highlighted in the mathematical analysis, I've added a preliminary experiment inspired by the stochastic chain environment from Pan et al. (2023). This serves as a proof-of-concept to show how standard GFlowNets falter in stochastic settings, while the stochastic variant holds up. It's a simple chain where you start at state 0 and can either "stop" (terminate with reward at current state) or "continue" (move forward with probability p=0.5 or stay put with 0.5). The reward function is bimodal, with peaks around N/4 and 3N/4, making it a good test for capturing multiple modes without collapse.
