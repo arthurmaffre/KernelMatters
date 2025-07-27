@@ -34,18 +34,18 @@ The true target distribution for multi-round trajectories $τ = (s₀, H₁, s�
 $$D_{KL}(P^* || P_T) = E_{P^*} [\log P(s_{t+1} | (s_t, H_t))] > 0$$
 
 unless P is deterministic (δ-function), which is impossible in this simulator due to Poisson and Bernoulli variability. The gap widens with branching factor: higher entropy $ℍ[P(· | (s, H))]$ biases $P_T$ toward low-entropy (greedy) modes, as unmodeled stochasticity favors paths with lower downstream variance.
-This manifests in the authors' episode generation: Graphs are built over 20 rounds, embedding cumulative stochasticity, but episodes sample actions per round (often N=1) and follow Markovian transitions. Trajectories at later rounds (e.g., n=5) have arrival probabilities influenced by prior rounds (e.g., n=2), as the pool's sparsity and edge distribution propagate through M. Effectively, the full state space forms an immense, sparse DAG with probabilistic edges between rounds—yet standard GFlowNets treat states as static or rounds as independent, fracturing the flow lattice. Marginal P_T(H) ∝ R(H) holds locally but oblivious to \mathbb{E}[∑_t R_t | π, M], leading to inconsistent global flows.
+This manifests in the authors' episode generation: Graphs are built over 20 rounds, embedding cumulative stochasticity, but episodes sample actions per round (often N=1) and follow Markovian transitions. Trajectories at later rounds (e.g., n=5) have arrival probabilities influenced by prior rounds (e.g., n=2), as the pool's sparsity and edge distribution propagate through M. Effectively, the full state space forms an immense, sparse DAG with probabilistic edges between rounds—yet standard GFlowNets treat states as static or rounds as independent, fracturing the flow lattice. Marginal $P_T(H) ∝ R(H)$ holds locally but oblivious to $\mathbb{E}[∑_t R_t | π, M]$, leading to inconsistent global flows.
 Gradient variance exacerbates this: In TB, 
 
 $$∇L_{TB} ≈ \sum_i ∇ log P_F \times (log Z + \sum log P_F - log R - \sum log P_B)$$
 
-; unmodeled P injects noise, with Var[∇L] = O(n · b) (n rounds, b average branches per transition). As seen in related works (e.g., Pan et al., Figs. 5-9), this causes instability and mode collapse. In the limit of uniform exploration (α → 1), P_T(H) flattens to uniform, erasing R—policies ignore transplant quality.
-A toy example illustrates: Consider two matchings H₁, H₂ in a fixed G, with static P_T(H₂)/P_T(H₁) = e^{-1} ≈ 0.37, but true \mathbb{E}[∑ R_t | H₂] > \mathbb{E}[∑ R_t | H₁] due to stochastic pool replenishment favoring H₂'s removals. Iteration traps in low-entropy greed, variance → ∞, crumbling the lattice.
+; unmodeled P injects noise, with $Var[∇L] = O(n · b)$ (n rounds, b average branches per transition). As seen in related works (e.g., Pan et al., Figs. 5-9), this causes instability and mode collapse. In the limit of uniform exploration (α → 1), P_T(H) flattens to uniform, erasing R—policies ignore transplant quality.
+A toy example illustrates: Consider two matchings $H₁$, $H₂$ in a fixed $G$, with static $P_T(H₂)/P_T(H₁) = e^{-1} ≈ 0.37$, but true $\mathbb{E}[∑ R_t | H₂] > \mathbb{E}[∑ R_t | H₁]$ due to stochastic pool replenishment favoring $H₂'s$ removals. Iteration traps in low-entropy greed, variance $→ ∞$, crumbling the lattice.
 Stochastic extensions rectify this via even-odd decomposition or similar:
 
 $$F(s) π(a | s) P(s' | (s, a)) = F(s') π_B((s, a) | s')$$
 
-with losses using \hat{P} ≈ M via MLE or sampling. This aligns P_T → P^*, driving D_{KL} → 0. Existing approaches like sub-trajectory balance in stochastic GFlowNets (e.g., handling probabilistic edges) directly address the sparse DAG structure here, integrating the kernel without assuming static states.
+with losses using $\hat{P} ≈ M$ via MLE or sampling. This aligns $P_T → P^*$, driving $D_{KL} → 0$. Existing approaches like sub-trajectory balance in stochastic GFlowNets (e.g., handling probabilistic edges) directly address the sparse DAG structure here, integrating the kernel without assuming static states.
 In summary, while the simulator faithfully captures KEP dynamics, the standard GFlowNet application overlooks transition stochasticity, leading to biased optimization and fractured flows. Incorporating the kernel explicitly would strengthen the framework for multi-round settings.
 
 ## KEP Environment Simulation
