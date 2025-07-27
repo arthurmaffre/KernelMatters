@@ -90,6 +90,9 @@ In the plot, the blue line (standard) climbs sharply as N increases, showing the
 
     Code (PyTorch-based, runs locally):
 
+## Future Directions
+
+The next phase involves implementing a GFlowNet model to test on the KEP environment. The goal is to extend the approach by incorporating Stochastic GFlowNets with sub-trajectory balance, evaluating whether this leads to better convergence, reduced bias, and improved handling of stochastic dynamics in KEP simulations.
 
 ## References
 
