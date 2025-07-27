@@ -102,6 +102,8 @@ The next phase involves implementing a GFlowNet model to test on the KEP environ
 
 ## License
 
-All rights reserved. No part of this repository, including but not limited to text, mathematical derivations, conceptual simulations, or any derived works, may be reproduced, modified, distributed, or used in any form or by any means—electronic, mechanical, photocopying, recording, or otherwise—without the explicit prior written permission of the author.
+This repository, including all text, mathematical derivations, conceptual simulations, and derived works, is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0). You are free to share, copy, distribute, and adapt the material for non-commercial purposes, provided you give appropriate credit to the author, provide a link to the original repository (https://github.com/yourusername/stochastic-kep-critique.git), and indicate if changes were made.
 
-This license is intentionally restrictive to preserve the integrity of the critique and prevent unauthorized adaptations that may dilute or misrepresent the mathematical analysis. Violations will be pursued to the fullest extent permitted by law. For inquiries, contact the repository owner.
+Citation Requirement: Any use of this work must include a citation to the author (please contact the repository owner for the preferred citation format) and the repository URL. For inquiries or to notify the author of use, contact the repository owner directly.
+
+Commercial use is prohibited without explicit written permission from the author. Violations of this license will be pursued to the fullest extent permitted by law.
