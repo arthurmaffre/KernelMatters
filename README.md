@@ -27,7 +27,7 @@ This setup aims to train GFlowNets to sample matchings H proportional to rewards
 
 $$Z_\phi \prod_{i=1}^n P_F(s_i \mid s_{i-1} ; \theta) = R(x) \prod_{i=1}^n P_B(s_{i-1} \mid s_i ; \theta)$$
 
-ensuring marginal termination probabilities $P_T(x) = ∑_{τ→x} P_F(τ) ∝ R(x)$, with $Z_\phi$ as the partition function. Detailed balance (DB) localizes this: $F(s) P_F(s' | s) = F(s') P_B(s | s')$, where F(s) = ∑{τ∋s} F(τ) aggregates flows through state s.
+ensuring marginal termination probabilities $P_T(x) = ∑_{τ→x} P_F(τ) ∝ R(x)$, with $Z_\phi$ as the partition function. Detailed balance (DB) localizes this: $F(s) P_F(s' | s) = F(s') P_B(s | s')$, where $F(s) = ∑_{τ∋s} F(τ)$ aggregates flows through state s.
 In KEPs, however, states evolve stochastically: after selecting H in state s = (G, ∅), the next state $s' = (G', ∅) ~ M(G, H)$, where M models Poisson arrivals, Bernoulli compatibilities, and edge additions/removals as in the simulator. This yields $|{G' | P(G' | (G, H)) > 0}| > 1$, introducing branching entropy. The assumption of deterministic transitions T(s, a) = s' breaks, as downstream rewards R_{t+1} disperse across possible G'.
 The true target distribution for multi-round trajectories $τ = (s₀, H₁, s₁, H₂, ..., s_n, H_n)$ is $P^*(τ) ∝ ∏_t R(H_t) ∏t P(s{t+1} | (s_t, H_t)), where P(· | (s_t, H_t))$ is the transition kernel from M. Yet standard GFlowNets optimize toward ∏_t R(H_t), ignoring the kernel. This induces a Kullback-Leibler divergence
 
