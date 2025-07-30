@@ -30,9 +30,9 @@ The authors' simulator, adapted from Saidman et al. (2006), faithfully models st
 
 Standard GFlowNets train to sample matchings $H$ proportional to $R(H)$, enforcing trajectory balance (TB):
 
-$$
-Z(s_0; \phi) \prod_{i=1}^n P_F(s_i \mid s_{i-1}; \theta) = R(x) \prod_{i=1}^n P_B(s_{i-1} \mid s_i; \theta),
-$$
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?Z%28s_0%3B%20%5Cphi%29%20%5Cprod_%7Bi%3D1%7D%5En%20P_F%28s_i%20%5Cmid%20s_%7Bi-1%7D%3B%20%5Ctheta%29%20%3D%20R%28x%29%20%5Cprod_%7Bi%3D1%7D%5En%20P_B%28s_%7Bi-1%7D%20%5Cmid%20s_i%3B%20%5Ctheta%29%2C" alt="Trajectory Balance Equation">
+</p>
 
 where $s_0$ is the initial state (empty matching on $G$), $\tau = (s_0 \to \dots \to s_n = x)$ is a trajectory terminating at maximal matching $x = (G, H)$, $Z$ is the learned partition function, $P_F$ and $P_B$ are forward and backward policies, and marginal termination probabilities satisfy $P_T(x) \propto R(x)$. This implies detailed balance (DB) localization:
 
