@@ -52,9 +52,9 @@ $$
 
 with $P(\cdot \mid \cdot, \cdot)$ from $M$. The GFlowNet marginal $P_T(\tau) \propto \prod_t R(H_t)$ omits the kernel, yielding Kullback-Leibler divergence:
 
-$$
-D_{\text{KL}}(P^* \parallel P_T) = \mathbb{E}_{P^*} \left[ \sum_t \log P(G_t \mid G_{t-1}, H_{t-1}) \right] - \mathcal{H}[P^*] + \mathcal{H}[P_T].
-$$
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?D_%7B%5Cmathrm%7BKL%7D%7D%5Cleft%28P%5E%2A%20%5Cparallel%20P_T%5Cright%29%20%3D%20%5Cmathbb%7BE%7D_%7BP%5E%2A%7D%5Cleft%5B%5Csum_t%20%5Clog%20P%28G_t%20%5Cmid%20G_%7Bt-1%7D%2C%20H_%7Bt-1%7D%29%20%5Cright%5D%20-%20%5Cmathcal%7BH%7D%5BP%5E%2A%5D%20%2B%20%5Cmathcal%7BH%7D%5BP_T%5D" alt="KL divergence">
+</p>
 
 Since $\mathcal{H}[P^*] = \mathcal{H}[P_T] + \sum_t \mathbb{E}_{P^*} [\mathcal{H}[P(G_t \mid \cdot)]]$ (by chain rule, with extra entropy from transitions), and the expectation term is positive unless $M$ is deterministic (impossible given Poisson/Bernoulli variability), $D_{\text{KL}} > 0$. This gap scales with branching: higher $\mathcal{H}[P(\cdot \mid \cdot)]$ biases $P_T$ toward low-variance modes, as unmodeled stochasticity penalizes exploratory paths with dispersed downstream rewards. In economic terms, this collapses to greedy, short-sighted policies, underweighting matchings that preserve pool diversity for future welfare gains—e.g., sparing hard-to-match pairs yields $\mathbb{E}[\sum R_t \mid H]$ inflated by replenishment, but variance suppresses sampling.
 
