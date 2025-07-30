@@ -10,6 +10,8 @@ By integrating Stochastic GFlowNets (Pan et al., 2023), we address inherent limi
 - **Simulation Framework**: Conceptual tools to replicate biases in toy KEPs, highlighting cascades in expected transplants and pool composition.
 - **Ethical Imperative**: In KEPs, where each transplant equates to substantial quality-adjusted life years (valued at >$5M per case in health economics), unaddressed biases represent a quantifiable inefficiency. This repo advocates for stochastic integration to align models with probabilistic reality.
 
+No executable code is included; simulations are conceptual and can be implemented via standard libraries (e.g., NumPy for Monte-Carlo runs). For replication, refer to the mathematical sections below.
+
 ## Installation and Usage
 
 This is a documentation-only repository. Clone for reference:
@@ -20,33 +22,61 @@ git clone https://github.com/yourusername/stochastic-kep-critique.git
 
 No dependencies required beyond a LaTeX viewer for equations. Explore the mathematical dissection for insights; extend via cited works.
 
-## Mathematical Dissection: Fracturing the Flow Lattice in Stochastic KEPs
-To evaluate GFlowNets for Kidney Exchange Programs (KEPs), the authors employ a simulator based on Saidman et al. (2006), modeling graph evolution as a Markovian process over multiple rounds. Incompatible patient-donor pairs arrive according to a Poisson distribution with rate λ = 5 per round. For each arriving pair, blood types are sampled from predefined probabilities, and compatibility edges are added following the ABO model (Dean, 2005). Hard-to-match status is determined via calculated panel reactive antibody (cPRA) percentages (Tinckam et al., 2015), with outgoing edges removed stochastically via Bernoulli draws parameterized by cPRA. Non-directed donors are omitted for simplicity. Over N = 20 rounds, this yields graphs with an expected 100 vertices, capturing the stochastic buildup of the KEP pool through arrivals and compatibilities.
-Episodes are generated from these graphs by sampling actions (matchings H) randomly and following the Markovian process between rounds, though the description specifies N = 1 and λ = 5 for episode simulation, suggesting a focus on single-round dynamics within the larger pool. For each graph, 1000 episodes are produced, resulting in a dataset of 100,000 trajectory vectors $(ϑ₁, ..., ϑ_L)$, where each $ϑ_i$ represents an episode. Conditional information from initial graphs per round is incorporated via embeddings. The model architecture includes pipelines for embeddings, initial flow Z, and forward probabilities $P_F$, with details in their Table 6.
-This setup aims to train GFlowNets to sample matchings H proportional to rewards R(H) (e.g., number of transplants), but it reveals fundamental fractures when applied to multi-round stochastic environments. Standard GFlowNets enforce equilibrium in deterministic DAGs: for a trajectory $τ = (s_0 → ... → s_n = x)$. In their setup, (TB) requires:
+## Mathematical Dissection: Biases in Deterministic GFlowNets for Stochastic KEPs from a Social Planner's Perspective
 
-$$Z_\phi \prod_{i=1}^n P_F(s_i \mid s_{i-1} ; \theta) = R(x) \prod_{i=1}^n P_B(s_{i-1} \mid s_i ; \theta)$$
+In evaluating the application of GFlowNets to Kidney Exchange Programs (KEPs) as proposed in St-Arnaud et al. (2025), we adopt the lens of a social planner aiming to maximize aggregate welfare over time. In economic terms, the planner seeks to optimize the expected sum of transplants, weighted by quality-adjusted life years (QALYs), across a multi-round horizon: $\max_{\pi} \mathbb{E}_{\pi, M} \left[ \sum_{t=1}^T \gamma^{t-1} R(H_t) \right]$, where $\pi$ is the policy for selecting matchings $H_t$ in state $s_t = G_t$ (the compatibility graph at round $t$), $M$ is the stochastic transition kernel governing graph evolution, $R(H_t)$ is the reward (e.g., number of transplants or a welfare-weighted variant accounting for patient equity), $\gamma \in [0,1]$ discounts future rounds, and the expectation integrates over trajectories induced by $\pi$ and $M$. Each transplant contributes substantial welfare, estimated at over $5$ million in QALY-adjusted terms (Cutler and McClellan, 2001), making biases in $\pi$ economically inefficient—equivalent to foregone societal value.
 
-ensuring marginal termination probabilities $P_T(x) = ∑_{τ→x} P_F(τ) ∝ R(x)$, with $Z_\phi$ as the partition function. Detailed balance (DB) localizes this: $F(s) P_F(s' | s) = F(s') P_B(s | s')$, where $F(s) = ∑_{τ∋s} F(τ)$ aggregates flows through state $s$.
-In KEPs, however, states evolve stochastically: after selecting $H$ in state $s = (G, ∅)$, the next state $s' = (G', ∅) ~ M(G, H)$, where M models Poisson arrivals, Bernoulli compatibilities, and edge additions/removals as in the simulator. This yields $|{G' | P(G' | (G, H)) > 0}| > 1$, introducing branching entropy. The assumption of deterministic transitions $T(s, a) = s'$ breaks, as downstream rewards $R_{t+1}$ disperse across possible $G'$.
-The true target distribution for multi-round trajectories $τ = (s₀, H₁, s₁, H₂, ..., s_n, H_n)$ is $P^*(τ) ∝ ∏_t R(H_t) ∏t P(s{t+1} | (s_t, H_t))$, where $P(· | (s_t, H_t))$ is the transition kernel from $M$. Yet standard GFlowNets optimize toward $∏_t R(H_t)$, ignoring the kernel. This induces a Kullback-Leibler divergence
+The authors' simulator, adapted from Saidman et al. (2006), faithfully models stochastic graph evolution: incompatible pairs arrive via Poisson process with rate $\lambda = 5$ per round, blood types sampled from empirical distributions (O: 48.14%, A: 33.73%, B: 14.28%, AB: 3.85%), compatibility edges added per ABO rules (Dean, 2005), and outgoing edges stochastically removed via Bernoulli trials parameterized by calculated panel reactive antibody (cPRA) levels (low: 0.05 with 70.19% probability, medium: 0.45 with 20%, high: 0.90 with 9.81%; Tinckam et al., 2015). Graphs are constructed over $N=20$ rounds, yielding expected 100 vertices, but episodes focus on single-round dynamics ($N=1$) with 1000 trajectories per graph, generating a dataset of 100,000 vectors $(\vartheta_1, \dots, \vartheta_L)$, where each $\vartheta_i$ encodes a trajectory. Initial graph embeddings condition the model, with architecture details in their Table 6.
 
-$$D_{KL}(P^* || P_T) = E_{P^*} [\log P(s_{t+1} | (s_t, H_t))] > 0$$
+Standard GFlowNets train to sample matchings $H$ proportional to $R(H)$, enforcing trajectory balance (TB):
 
-unless P is deterministic (δ-function), which is impossible in this simulator due to Poisson and Bernoulli variability. The gap widens with branching factor: higher entropy $ℍ[P(· | (s, H))]$ biases $P_T$ toward low-entropy (greedy) modes, as unmodeled stochasticity favors paths with lower downstream variance.
-This manifests in the authors' episode generation: Graphs are built over 20 rounds, embedding cumulative stochasticity, but episodes sample actions per round (often N=1) and follow Markovian transitions. Trajectories at later rounds (e.g., n=5) have arrival probabilities influenced by prior rounds (e.g., n=2), as the pool's sparsity and edge distribution propagate through M. Effectively, the full state space forms an immense, sparse DAG with probabilistic edges between rounds—yet standard GFlowNets treat states as static or rounds as independent, fracturing the flow lattice. Marginal $P_T(H) ∝ R(H)$ holds locally but oblivious to $\mathbb{E}[∑_t R_t | π, M]$, leading to inconsistent global flows.
-Gradient variance exacerbates this: In TB, 
+$$
+Z(s_0; \phi) \prod_{i=1}^n P_F(s_i \mid s_{i-1}; \theta) = R(x) \prod_{i=1}^n P_B(s_{i-1} \mid s_i; \theta),
+$$
 
-$$∇L_{TB} ≈ \sum_i ∇ log P_F \times (log Z + \sum log P_F - log R - \sum log P_B)$$
+where $s_0$ is the initial state (empty matching on $G$), $\tau = (s_0 \to \dots \to s_n = x)$ is a trajectory terminating at maximal matching $x = (G, H)$, $Z$ is the learned partition function, $P_F$ and $P_B$ are forward and backward policies, and marginal termination probabilities satisfy $P_T(x) \propto R(x)$. This implies detailed balance (DB) localization:
 
-; unmodeled P injects noise, with $Var[∇L] = O(n · b)$ (n rounds, b average branches per transition). As seen in related works (e.g., Pan et al., Figs. 5-9), this causes instability and mode collapse. In the limit of uniform exploration (α → 1), P_T(H) flattens to uniform, erasing R—policies ignore transplant quality.
-A toy example illustrates: Consider two matchings $H₁$, $H₂$ in a fixed $G$, with static $P_T(H₂)/P_T(H₁) = e^{-1} ≈ 0.37$, but true $\mathbb{E}[∑ R_t | H₂] > \mathbb{E}[∑ R_t | H₁]$ due to stochastic pool replenishment favoring $H₂'s$ removals. Iteration traps in low-entropy greed, variance $→ ∞$, crumbling the lattice.
-Stochastic extensions rectify this via even-odd decomposition or similar:
+$$
+F(s) P_F(s' \mid s) = F(s') P_B(s \mid s'),
+$$
 
-$$F(s) π(a | s) P(s' | (s, a)) = F(s') π_B((s, a) | s')$$
+with state flows $F(s) = \sum_{\tau \ni s} F(\tau)$.
 
-with losses using $\hat{P} ≈ M$ via MLE or sampling. This aligns $P_T → P^*$, driving $D_{KL} → 0$. Existing approaches like sub-trajectory balance in stochastic GFlowNets (e.g., handling probabilistic edges) directly address the sparse DAG structure here, integrating the kernel without assuming static states.
-In summary, while the simulator faithfully captures KEP dynamics, the standard GFlowNet application overlooks transition stochasticity, leading to biased optimization and fractured flows. Incorporating the kernel explicitly would strengthen the framework for multi-round settings.
+However, KEPs exhibit stochastic transitions: after selecting $H$ in $s_t = (G_t, H_t)$, the next graph $G_{t+1} \sim M(G_t \setminus H_t)$, incorporating Poisson arrivals, sampled compatibilities, and cPRA-driven removals. This yields a non-degenerate kernel $P(G_{t+1} \mid G_t, H_t) > 0$ for multiple $G_{t+1}$, with entropy $\mathcal{H}[P(\cdot \mid G_t, H_t)] > 0$. The authors' GFlowNet assumes deterministic transitions $T(s_t, H_t) = s_{t+1}$, optimizing toward $\prod_t R(H_t)$ while ignoring the kernel, effectively treating rounds as independent or graphs as static.
+
+This induces bias in the learned policy $\pi_\theta(H \mid G) \approx P_F$, deviating from the social planner's optimum. The true target posterior over multi-round trajectories $\tau = (G_0, H_1, G_1, H_2, \dots, G_T, H_T)$ is:
+
+$$
+P^*(\tau) \propto \prod_{t=1}^T R(H_t) \cdot P(G_t \mid G_{t-1}, H_{t-1}),
+$$
+
+with $P(\cdot \mid \cdot, \cdot)$ from $M$. The GFlowNet marginal $P_T(\tau) \propto \prod_t R(H_t)$ omits the kernel, yielding Kullback-Leibler divergence:
+
+$$
+D_{\text{KL}}(P^* \parallel P_T) = \mathbb{E}_{P^*} \left[ \sum_t \log P(G_t \mid G_{t-1}, H_{t-1}) \right] - \mathcal{H}[P^*] + \mathcal{H}[P_T].
+$$
+
+Since $\mathcal{H}[P^*] = \mathcal{H}[P_T] + \sum_t \mathbb{E}_{P^*} [\mathcal{H}[P(G_t \mid \cdot)]]$ (by chain rule, with extra entropy from transitions), and the expectation term is positive unless $M$ is deterministic (impossible given Poisson/Bernoulli variability), $D_{\text{KL}} > 0$. This gap scales with branching: higher $\mathcal{H}[P(\cdot \mid \cdot)]$ biases $P_T$ toward low-variance modes, as unmodeled stochasticity penalizes exploratory paths with dispersed downstream rewards. In economic terms, this collapses to greedy, short-sighted policies, underweighting matchings that preserve pool diversity for future welfare gains—e.g., sparing hard-to-match pairs yields $\mathbb{E}[\sum R_t \mid H]$ inflated by replenishment, but variance suppresses sampling.
+
+Gradient variance in TB exacerbates inefficiency:
+
+$$
+\nabla L_{\text{TB}} \approx \sum_\tau \nabla \log P_F(\tau) \cdot \left( \log Z + \sum \log P_F - \log R - \sum \log P_B \right),
+$$
+
+where unmodeled $M$ injects noise via sampled $G_{t+1}$, with $\text{Var}[\nabla L] = O(T \cdot \bar{b})$ ($T$ rounds, $\bar{b}$ average branches). As $T \to \infty$, variance diverges, inducing mode collapse (Pan et al., 2023, Figs. 5-9), flattening $P_T$ to uniform under exploration ($\alpha \to 1$) or greedy under exploitation.
+
+Time-dependency amplifies this on real data, fracturing the assumed static DAG. In the simulator, graphs accumulate stochasticity over 20 rounds, but single-round episodes ($N=1$) treat states as independent, ignoring propagation: later-round sparsity/edges depend on prior $H_t$ via $M$. Real KEPs exhibit stronger dependency due to demographic biases in cPRA: Black patients are disproportionately sensitized (cPRA >80% in ~25-30% of cases vs. ~15-20% for Whites; Reese et al., 2016, from UNOS data implying higher from disparities in prior exposures), as are Hispanics (~20-25% high cPRA; Pando et al., 2018). Statistically, Black candidates comprise ~32% of the waitlist but receive ~25% of transplants, with higher cPRA causing longer dwell times (OPTN/SRTR 2022 Report: Blacks have 2x ESRD incidence, lower transplant rates). This skews pool composition: minorities accumulate, altering edge densities (fewer outgoing for high-cPRA), making $P(G_t \mid \cdot)$ history-dependent. Proved via conditional entropy: $\mathcal{H}[G_t \mid G_{t-1}, H_{t-1}] < \mathcal{H}[G_t]$ (arrivals conditioned on removals), but cross-round $\mathbb{E}[\text{cPRA}(G_t)] > \mathbb{E}[\text{cPRA}(G_0)]$ due to retention, with racial correlation $\text{Cov}(\text{cPRA}, \text{Race}) > 0$ (e.g., regression coefficients from SRTR: $\beta_{\text{Black}} \approx 0.15-0.20$ for high-cPRA probability). Thus, assuming time-independence biases marginals, under-sampling equity-weighted $H$ for minorities, reducing planner welfare by ~10-20% in disparate access (Mohandas et al., 2022 estimates).
+
+Outside the authors' a priori simulated pipeline—where graphs are generated homogenously without real demographic correlations—the model breaks: real UNOS data introduces persistent time-dependencies, inflating $D_{\text{KL}}$ as simulated embeddings fail to capture evolving distributions, leading to higher variance and collapse (e.g., test KL spikes 2-5x in Pan et al. analogs).
+
+To correct, integrate Stochastic GFlowNets (Pan et al., 2023) via sub-trajectory balance, incorporating the kernel:
+
+$$
+F(s) \pi(a \mid s) P(s' \mid s, a) = F(s') \pi_B((s, a) \mid s'),
+$$
+
+with losses using $\hat{P} \approx M$ (MLE or Monte Carlo samples from simulator/real traces). This aligns $P_T \to P^*$, driving $D_{\text{KL}} \to 0$, stabilizing gradients, and enabling unbiased multi-round optimization—better serving the planner by capturing full entropy for equitable, long-term welfare maximization.
 
 ## KEP Environment Simulation
 
@@ -103,3 +133,5 @@ This repository, including all text, mathematical derivations, conceptual simula
 Citation Requirement: Any use of this work must include a citation to the author (please contact the repository owner for the preferred citation format) and the repository URL. For inquiries or to notify the author of use, contact the repository owner directly.
 
 Commercial use is prohibited without explicit written permission from the author. Violations of this license will be pursued to the fullest extent permitted by law.
+
+
