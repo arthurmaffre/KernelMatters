@@ -60,9 +60,9 @@ Since $\mathcal{H}[P^*] = \mathcal{H}[P_T] + \sum_t \mathbb{E}_{P^*} [\mathcal{H
 
 Gradient variance in TB exacerbates inefficiency:
 
-$$
-\nabla L_{\text{TB}} \approx \sum_\tau \nabla \log P_F(\tau) \cdot \left( \log Z + \sum \log P_F - \log R - \sum \log P_B \right),
-$$
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?%5Cnabla%20L_%7B%5Ctext%7BTB%7D%7D%20%5Capprox%20%5Csum_%5Ctau%20%5Cnabla%20%5Clog%20P_F%28%5Ctau%29%20%5Ccdot%20%5Cleft%28%20%5Clog%20Z%20%2B%20%5Csum%20%5Clog%20P_F%20-%20%5Clog%20R%20-%20%5Csum%20%5Clog%20P_B%20%5Cright%29%2C" alt="Gradient of TB Loss">
+</p>
 
 where unmodeled $M$ injects noise via sampled $G_{t+1}$, with $\text{Var}[\nabla L] = O(T \cdot \bar{b})$ ($T$ rounds, $\bar{b}$ average branches). As $T \to \infty$, variance diverges, inducing mode collapse (Pan et al., 2023, Figs. 5-9), flattening $P_T$ to uniform under exploration ($\alpha \to 1$) or greedy under exploitation.
 
