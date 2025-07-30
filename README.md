@@ -36,9 +36,9 @@ $$
 
 where $s_0$ is the initial state (empty matching on $G$), $\tau = (s_0 \to \dots \to s_n = x)$ is a trajectory terminating at maximal matching $x = (G, H)$, $Z$ is the learned partition function, $P_F$ and $P_B$ are forward and backward policies, and marginal termination probabilities satisfy $P_T(x) \propto R(x)$. This implies detailed balance (DB) localization:
 
-$$
-F(s) P_F(s' \mid s) = F(s') P_B(s \mid s'),
-$$
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?F%28s%29%20P_F%28s%27%20%5Cmid%20s%29%20%3D%20F%28s%27%29%20P_B%28s%20%5Cmid%20s%27%29%2C" alt="Detailed Balance Equation">
+</p>
 
 with state flows $F(s) = \sum_{\tau \ni s} F(\tau)$.
 
