@@ -72,9 +72,9 @@ Outside the authors' a priori simulated pipeline—where graphs are generated ho
 
 To correct, integrate Stochastic GFlowNets (Pan et al., 2023) via sub-trajectory balance, incorporating the kernel:
 
-$$
-F(s) \pi(a \mid s) P(s' \mid s, a) = F(s') \pi_B((s, a) \mid s'),
-$$
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?F%28s%29%20%5Cpi%28a%20%5Cmid%20s%29%20P%28s%27%20%5Cmid%20s%2C%20a%29%20%3D%20F%28s%27%29%20%5Cpi_B%28%28s%2C%20a%29%20%5Cmid%20s%27%29%2C" alt="Sub-trajectory balance equation">
+</p>
 
 with losses using $\hat{P} \approx M$ (MLE or Monte Carlo samples from simulator/real traces). This aligns $P_T \to P^*$, driving $D_{\text{KL}} \to 0$, stabilizing gradients, and enabling unbiased multi-round optimization—better serving the planner by capturing full entropy for equitable, long-term welfare maximization.
 
