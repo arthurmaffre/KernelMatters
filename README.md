@@ -46,9 +46,9 @@ However, KEPs exhibit stochastic transitions: after selecting $H$ in $s_t = (G_t
 
 This induces bias in the learned policy $\pi_\theta(H \mid G) \approx P_F$, deviating from the social planner's optimum. The true target posterior over multi-round trajectories $\tau = (G_0, H_1, G_1, H_2, \dots, G_T, H_T)$ is:
 
-$$
-P^*(\tau) \propto \prod_{t=1}^T R(H_t) \cdot P(G_t \mid G_{t-1}, H_{t-1}),
-$$
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?P%5E%2A%28%5Ctau%29%20%5Cpropto%20%5Cprod_%7Bt%3D1%7D%5ET%20R%28H_t%29%20%5Ccdot%20P%28G_t%20%5Cmid%20G_%7Bt-1%7D%2C%20H_%7Bt-1%7D%29%2C" alt="Trajectory Posterior Equation">
+</p>
 
 with $P(\cdot \mid \cdot, \cdot)$ from $M$. The GFlowNet marginal $P_T(\tau) \propto \prod_t R(H_t)$ omits the kernel, yielding Kullback-Leibler divergence:
 
