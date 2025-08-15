@@ -54,7 +54,7 @@ with state flows $F(s) = \sum_{\tau \ni s} F(\tau)$.
 
 However, KEPs exhibit stochastic transitions: after selecting $H$ in $s_t = (G_t, H_t)$, the next graph $G_{t+1} \sim M(G_t \setminus H_t)$, incorporating Poisson arrivals, sampled compatibilities, and cPRA-driven removals. This yields a non-degenerate kernel $P(G_{t+1} \mid G_t, H_t) > 0$ for multiple $G_{t+1}$, with entropy $\mathcal{H}[P(\cdot \mid G_t, H_t)] > 0$. The authors' GFlowNet assumes deterministic transitions $T(s_t, H_t) = s_{t+1}$, optimizing toward $\prod_t R(H_t)$ while ignoring the kernel, effectively treating rounds as independent or graphs as static.
 
-This induces bias in the learned policy $  \pi_\theta(H \mid G) \approx P_F  $, preventing convergence to the true target distribution due to unmodeled stochastic transitions and time-dependencies. The true target posterior over multi-round trajectories $  \tau = (G_0, H_1, G_1, H_2, \dots, G_T, H_T)  $ is:
+This induces bias in the learned policy $\pi_\theta(H \mid G) \approx P_F$, preventing convergence to the true target distribution due to unmodeled stochastic transitions and time-dependencies. The true target posterior over multi-round trajectories $\tau = (G_0, H_1, G_1, H_2, \dots, G_T, H_T)$ is:
 
 <p align="center">
   <img src="https://latex.codecogs.com/png.latex?P%5E%2A%28%5Ctau%29%20%5Cpropto%20%5Cprod_%7Bt%3D1%7D%5ET%20R%28H_t%29%20%5Ccdot%20P%28G_t%20%5Cmid%20G_%7Bt-1%7D%2C%20H_%7Bt-1%7D%29%2C" alt="Trajectory Posterior Equation">
