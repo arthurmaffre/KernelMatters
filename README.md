@@ -10,8 +10,6 @@ By integrating Stochastic GFlowNets ([Pan et al. (2023)](https://arxiv.org/abs/2
 - **Simulation Framework**: Conceptual tools to replicate biases in toy KEPs, highlighting cascades in expected transplants and pool composition.
 - **Ethical Imperative**: In KEPs, where each transplant equates to substantial quality-adjusted life years (valued at >$1.5M per case in health economics), unaddressed biases represent a quantifiable inefficiency. This repo advocates for stochastic integration to align models with probabilistic reality.
 
-No executable code is included; simulations are conceptual and can be implemented via standard libraries (e.g., NumPy for Monte-Carlo runs). For replication, refer to the mathematical sections below.
-
 ## Installation and Usage
 
 This is a documentation-only repository. Clone for reference:
