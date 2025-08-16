@@ -71,10 +71,13 @@ To derive the positivity bound explicitly: note that $\( \mathcal{H}[G_t \mid \c
 #### Non-Stationary Amortization and Propagating Gradient Variance
 Delving deeper into optimization dynamics, the TB objective—a local proxy for flow consistency—assumes stationary state sampling, but intertemporal dependencies render the effective data distribution $\( \mu(G_t; \theta) = \int q_{t-1}(G_{t-1}; \theta) M(G_t \mid G_{t-1}, P_F(\cdot \mid G_{t-1}; \theta)) \, dG_{t-1} \)$ policy-dependent. Updating $\( \theta \)$ at early rounds (e.g., refining edge-selection logits in the GNN policy for t=2) cascades forward: $\( \Delta \theta \) induces \( \Delta q_{t+k} = O(\prod_{j=1}^k \|\partial M / \partial H\| \cdot \|\partial P_F / \partial \theta\|) \)$, where the Jacobian $\( \partial M / \partial H \)$ captures matching-induced removals (e.g., deleting $|H_t|$ edges/vertices, altering future compatibilities).
 
-This propagation deregulates inclusion probabilities $\( P(\vartheta_i \in \mathcal{L}; \theta) \)$ across the horizon: for a trajectory \( \vartheta_i \) at t=19, its weight shifts by \( \Delta P \propto \sum_{k=1}^{18} \mathrm{Cov}(\nabla_\theta \log P_F(H_k), \log q_{19}) \), implicitly reweighting all downstream losses. Mathematically, the gradient estimator under this non-stationarity becomes:
-\[
-\nabla_\theta L_{\mathrm{TB}} = \mathbb{E}_{\tau \sim P_F(\cdot; \theta)} \left[ \nabla_\theta \log P_F(\tau) \cdot \left( \log Z(\theta) + \sum \log P_F - \log R - \sum \log P_B \right) + \lambda(\theta) \right],
-\]
+This propagation deregulates inclusion probabilities $\( P(\vartheta_i \in \mathcal{L}; \theta) \)$ across the horizon: for a trajectory \( \vartheta_i \) at $t=19$, its weight shifts by $\( \Delta P \propto \sum_{k=1}^{18} \mathrm{Cov}(\nabla_\theta \log P_F(H_k), \log q_{19}) \)$, implicitly reweighting all downstream losses. Mathematically, the gradient estimator under this non-stationarity becomes:
+
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?%5Cnabla_%5Ctheta%20L_%7B%5Cmathrm%7BTB%7D%7D%20%3D%20%5Cmathbb%7BE%7D_%7B%5Ctau%20%5Csim%20P_F%28%5Ccdot%3B%20%5Ctheta%29%7D%20%5Cleft%5B%20%5Cnabla_%5Ctheta%20%5Clog%20P_F%28%5Ctau%29%20%5Ccdot%20%5Cleft%28%20%5Clog%20Z%28%5Ctheta%29%20%2B%20%5Csum%20%5Clog%20P_F%20-%20%5Clog%20R%20-%20%5Csum%20%5Clog%20P_B%20%5Cright%29%20%2B%20%5Clambda%28%5Ctheta%29%20%5Cright%5D%2C" 
+       alt="Gradient of TB objective">
+</p>
+
 where \( \lambda(\theta) = O(T) \) bias term arises from \( \partial \mu / \partial \theta \), inflating variance to \( \mathrm{Var}[\nabla L] = O(T^2 \cdot \bar{b}^2 + T \cdot \mathrm{Var}[M]) \), with \( \bar{b} \) the per-round branching (~|E_t|^3 for 3-cycles). As T → ∞, this diverges unless mitigated by detailed balance objectives, which enforce local flow equilibria but falter in non-reversible dynamics like KEPs (irreversible departures).
 
 In high-dimensional embeddings (Table 6: ~128 dims), this echoes mode collapse in energy-based models, where variance cascades flatten distributions or trap in local minima. Empirical evidence in St-Arnaud et al. (2025) corroborates: performance erodes post ~10 rounds, despite GFlowNets' prowess on long static sequences (~200 steps), as the "mega-trajectory" devolves into sub-TB over stochastic DAGs—effectively a noisy, non-deterministic flow network where forward flows misalign due to latent entropy.
