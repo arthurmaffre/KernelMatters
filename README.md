@@ -60,7 +60,7 @@ where $\( Z^* \)$ and $\( Z_T \)$ are the respective partition functions. Decomp
   <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BH%7D%5BP%5E*%5D%20%3D%20%5Cmathcal%7BH%7D%5BG_1%5D%20%2B%20%5Csum_t%20%5Cmathcal%7BH%7D%5BH_t%20%5Cmid%20G_t%5D%20%2B%20%5Csum_%7Bt%3D2%7D%5ET%20%5Cmathcal%7BH%7D%5BG_t%20%5Cmid%20G_%7Bt-1%7D%2C%20H_%7Bt-1%7D%5D%2C" alt="Entropy decomposition">
 </p>
 
-while $\( \mathcal{H}[P_T] = \mathcal{H}[G_1] + \sum_t \mathcal{H}[H_t \mid G_t] \)$, yielding $\( D_{\mathrm{KL}} = \sum_{t=2}^T \mathbb{E}_{P^*} [\mathcal{H}[G_t \mid \cdot]] > 0 \)$. This divergence scales as $\( O(T \cdot \bar{h}) \)$, where $\( \bar{h} = \mathbb{E}[\mathcal{H}[M]] \)$ reflects the intrinsic entropy of transitions (e.g., $~log(λ!)$ for Poisson arrivals with $λ=5$, plus binomial entropy from cPRA Bernoulli trials ~0.05-0.90).
+while $\mathcal{H}[P_T] = \mathcal{H}[G_1] + \sum_t \mathcal{H}[H_t \mid G_t]$, yielding $D_{\mathrm{KL}} = \sum_{t=2}^T \mathbb{E}_{P^*} [\mathcal{H}[G_t \mid \cdot]] > 0$. This divergence scales as $O(T \cdot \bar{h})$, where $\bar{h} = \mathbb{E}[\mathcal{H}[M]]$ reflects the intrinsic entropy of transitions (e.g., $~log(λ!)$ for Poisson arrivals with $λ=5$, plus binomial entropy from cPRA Bernoulli trials ~0.05-0.90).
 
 Conceptually, this is analogous to variational autoencoders in sequential data, where unmodeled dynamics inflate the evidence lower bound (ELBO) gap, biasing the amortizer toward low-entropy modes that collapse exploration. In KEPs, this manifests as under-sampling matchings that "invest" in pool diversity (e.g., sparing O-blood donors for future high-cPRA recipients), as their downstream rewards are dispersed across stochastic branches, penalizing their flow allocation.
 
