@@ -103,7 +103,8 @@ To prove convergence instability: consider the fixed-point
        alt="Optimal parameter equation">
 </p>
 
-the update $\( \theta_{n+1} = \theta_n - \eta \nabla L \)$ follows a stochastic approximation with drift $\( \mathbb{E}[\Delta \theta] = -\eta \nabla L + O(\eta^2 \partial^2 L / \partial \theta \partial \mu) \)$, yielding oscillatory divergence for η > 1 / Lip(∂μ/∂θ), where Lipschitz constant scales with T. PAC-Bayes bounds confirm: generalization $error ≥ O(√(KL(θ || prior) / N) + T \bar{h} / N)$, exploding for finite datasets (~100k trajectories).
+the update $\( \theta_{n+1} = \theta_n - \eta \nabla L \)$ follows a stochastic approximation with drift <img src="https://latex.codecogs.com/svg.latex?\mathbb{E}[\Delta%20\theta]%20=%20-\eta%20\nabla%20L%20+%20O(\eta^2%20\frac{\partial^2%20L}{\partial%20\theta%20\partial%20\mu})" 
+     alt="Expected update equation" style="display:inline; vertical-align:middle;">, yielding oscillatory divergence for η > 1 / Lip(∂μ/∂θ), where Lipschitz constant scales with T. PAC-Bayes bounds confirm: generalization $error ≥ O(√(KL(θ || prior) / N) + T \bar{h} / N)$, exploding for finite datasets (~100k trajectories).
 
 From a social planner's vantage, this underscores a fundamental tension in amortized generative models for planning: balancing immediate exploitation with stochastic foresight requires explicit dynamics modeling, perhaps via recurrent GFlowNets or hierarchical flows over meta-trajectories. Future directions could integrate causal abstractions, amortizing not just matchings but transition kernels, to align with long-horizon welfare maximization in uncertain, evolving systems.
 
