@@ -96,7 +96,14 @@ where $\( \lambda(\theta) = O(T) \)$ bias term arises from $\( \partial \mu / \p
 
 In high-dimensional embeddings (Table 6: ~128 dims), this echoes mode collapse in energy-based models, where variance cascades flatten distributions or trap in local minima. Empirical evidence in St-Arnaud et al. (2025) corroborates: performance erodes post ~10 rounds, despite GFlowNets' prowess on long static sequences (~200 steps), as the "mega-trajectory" devolves into sub-TB over stochastic DAGs—effectively a noisy, non-deterministic flow network where forward flows misalign due to latent entropy.
 
-To prove convergence instability: consider the fixed-point $\( \theta^* = \arg\min L(\theta; \mu(\theta)) \); the update \( \theta_{n+1} = \theta_n - \eta \nabla L \)$ follows a stochastic approximation with drift $\( \mathbb{E}[\Delta \theta] = -\eta \nabla L + O(\eta^2 \partial^2 L / \partial \theta \partial \mu) \)$, yielding oscillatory divergence for η > 1 / Lip(∂μ/∂θ), where Lipschitz constant scales with T. PAC-Bayes bounds confirm: generalization $error ≥ O(√(KL(θ || prior) / N) + T \bar{h} / N)$, exploding for finite datasets (~100k trajectories).
+To prove convergence instability: consider the fixed-point 
+
+<p align="center">
+  <img src="https://latex.codecogs.com/svg.latex?\theta^*%20=%20\arg\min_{\theta}%20L(\theta;\;\mu(\theta))" 
+       alt="Optimal parameter equation">
+</p>
+
+the update $\( \theta_{n+1} = \theta_n - \eta \nabla L \)$ follows a stochastic approximation with drift $\( \mathbb{E}[\Delta \theta] = -\eta \nabla L + O(\eta^2 \partial^2 L / \partial \theta \partial \mu) \)$, yielding oscillatory divergence for η > 1 / Lip(∂μ/∂θ), where Lipschitz constant scales with T. PAC-Bayes bounds confirm: generalization $error ≥ O(√(KL(θ || prior) / N) + T \bar{h} / N)$, exploding for finite datasets (~100k trajectories).
 
 From a social planner's vantage, this underscores a fundamental tension in amortized generative models for planning: balancing immediate exploitation with stochastic foresight requires explicit dynamics modeling, perhaps via recurrent GFlowNets or hierarchical flows over meta-trajectories. Future directions could integrate causal abstractions, amortizing not just matchings but transition kernels, to align with long-horizon welfare maximization in uncertain, evolving systems.
 
