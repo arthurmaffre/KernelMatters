@@ -67,7 +67,14 @@ Conceptually, this is analogous to variational autoencoders in sequential data, 
 To derive the positivity bound explicitly: note that $\( \mathcal{H}[G_t \mid \cdot] = -\sum_{G_t} P(G_t \mid \cdot) \log P(G_t \mid \cdot) \geq 0 \)$, with equality only if $\( M \)$ is Dirac-deterministic (contradicted by empirical variability in ABO distributions and departures ~0.05 probability). Empirical quantification: in simulations over T=20, estimate via Monte Carlo sampling of 10^4 trajectories; the KL grows linearly until saturation at $\approx log(|state space|)$, correlating with $\approx 15\text{–}25$ % welfare shortfall in cumulative QALYs $\approx 1.5\,\text{M USD per transplant}$.
 
 #### Non-Stationary Amortization and Propagating Gradient Variance
-Delving deeper into optimization dynamics, the TB objective—a local proxy for flow consistency—assumes stationary state sampling, but intertemporal dependencies render the effective data distribution $\( \mu(G_t; \theta) = \int q_{t-1}(G_{t-1}; \theta) M(G_t \mid G_{t-1}, P_F(\cdot \mid G_{t-1}; \theta)) \, dG_{t-1} \)$ policy-dependent. Updating $\( \theta \)$ at early rounds (e.g., refining edge-selection logits in the GNN policy for t=2) cascades forward: $\( \Delta \theta \) induces \( \Delta q_{t+k} = O(\prod_{j=1}^k \|\partial M / \partial H\| \cdot \|\partial P_F / \partial \theta\|) \)$, where the Jacobian $\( \partial M / \partial H \)$ captures matching-induced removals (e.g., deleting $|H_t|$ edges/vertices, altering future compatibilities).
+Delving deeper into optimization dynamics, the TB objective—a local proxy for flow consistency—assumes stationary state sampling, but intertemporal dependencies render the effective data distribution 
+
+<p align="center">
+  <img src="https://latex.codecogs.com/png.latex?\mu(G_t;\theta)%20=%20\int%20q_{t-1}(G_{t-1};\theta)\,M(G_t%20\mid%20G_{t-1},P_F(\cdot%20\mid%20G_{t-1};\theta))\,dG_{t-1}" 
+       alt="Recursive mean field equation">
+</p>
+
+policy-dependent. Updating $\( \theta \)$ at early rounds (e.g., refining edge-selection logits in the GNN policy for t=2) cascades forward: $\( \Delta \theta \) induces \( \Delta q_{t+k} = O(\prod_{j=1}^k \|\partial M / \partial H\| \cdot \|\partial P_F / \partial \theta\|) \)$, where the Jacobian $\( \partial M / \partial H \)$ captures matching-induced removals (e.g., deleting $|H_t|$ edges/vertices, altering future compatibilities).
 
 This propagation deregulates inclusion probabilities $\( P(\vartheta_i \in \mathcal{L}; \theta) \)$ across the horizon: for a trajectory \( \vartheta_i \) at $t=19$, its weight shifts by $\( \Delta P \propto \sum_{k=1}^{18} \mathrm{Cov}(\nabla_\theta \log P_F(H_k), \log q_{19}) \)$, implicitly reweighting all downstream losses. Mathematically, the gradient estimator under this non-stationarity becomes:
 
