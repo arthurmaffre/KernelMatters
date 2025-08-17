@@ -74,7 +74,12 @@ Delving deeper into optimization dynamics, the TB objective—a local proxy for 
        alt="Recursive mean field equation">
 </p>
 
-policy-dependent. Updating $\( \theta \)$ at early rounds (e.g., refining edge-selection logits in the GNN policy for t=2) cascades forward: $\( \Delta \theta \) induces \( \Delta q_{t+k} = O(\prod_{j=1}^k \|\partial M / \partial H\| \cdot \|\partial P_F / \partial \theta\|) \)$, where the Jacobian $\( \partial M / \partial H \)$ captures matching-induced removals (e.g., deleting $|H_t|$ edges/vertices, altering future compatibilities).
+policy-dependent. Updating $\( \theta \)$ at early rounds (e.g., refining edge-selection logits in the GNN policy for t=2) cascades forward:
+<p align="center">
+  <img src="https://latex.codecogs.com/svg.latex?\Delta\theta\;\;induces\;\;\Delta%20q_{t+k}%20=%20O\!\Bigg(\prod_{j=1}^k%20\left\|\frac{\partial%20M}{\partial%20H}\right\|\cdot\left\|\frac{\partial%20P_F}{\partial%20\theta}\right\|\Bigg)" 
+       alt="Sensitivity propagation equation">
+</p>
+where the Jacobian $\( \partial M / \partial H \)$ captures matching-induced removals (e.g., deleting $|H_t|$ edges/vertices, altering future compatibilities).
 
 This propagation deregulates inclusion probabilities $\( P(\vartheta_i \in \mathcal{L}; \theta) \)$ across the horizon: for a trajectory \( \vartheta_i \) at $t=19$, its weight shifts by $\( \Delta P \propto \sum_{k=1}^{18} \mathrm{Cov}(\nabla_\theta \log P_F(H_k), \log q_{19}) \)$, implicitly reweighting all downstream losses. Mathematically, the gradient estimator under this non-stationarity becomes:
 
