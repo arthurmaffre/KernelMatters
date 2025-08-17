@@ -92,7 +92,14 @@ implicitly reweighting all downstream losses. Mathematically, the gradient estim
        alt="Gradient of TB objective">
 </p>
 
-where $\( \lambda(\theta) = O(T) \)$ bias term arises from $\( \partial \mu / \partial \theta \)$, inflating variance to $\( \mathrm{Var}[\nabla L] = O(T^2 \cdot \bar{b}^2 + T \cdot \mathrm{Var}[M]) \)$, with $\( \bar{b} \)$ the per-round branching (~|E_t|^3 for 3-cycles). As T → ∞, this diverges unless mitigated by detailed balance objectives, which enforce local flow equilibria but falter in non-reversible dynamics like KEPs (irreversible departures).
+where $\( \lambda(\theta) = O(T) \)$ bias term arises from $\( \partial \mu / \partial \theta \)$, inflating variance to :
+
+<p align="center">
+  <img src="https://latex.codecogs.com/svg.latex?\mathrm{Var}[\nabla%20L]%20=%20O\!\big(T^2%20\cdot%20\bar{b}^2%20+%20T%20\cdot%20\mathrm{Var}[M]\big)" 
+       alt="Gradient variance equation">
+</p>
+
+with $\( \bar{b} \)$ the per-round branching (~|E_t|^3 for 3-cycles). As T → ∞, this diverges unless mitigated by detailed balance objectives, which enforce local flow equilibria but falter in non-reversible dynamics like KEPs (irreversible departures).
 
 In high-dimensional embeddings (Table 6: ~128 dims), this echoes mode collapse in energy-based models, where variance cascades flatten distributions or trap in local minima. Empirical evidence in St-Arnaud et al. (2025) corroborates: performance erodes post ~10 rounds, despite GFlowNets' prowess on long static sequences (~200 steps), as the "mega-trajectory" devolves into sub-TB over stochastic DAGs—effectively a noisy, non-deterministic flow network where forward flows misalign due to latent entropy.
 
