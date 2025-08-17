@@ -81,7 +81,11 @@ policy-dependent. Updating $\( \theta \)$ at early rounds (e.g., refining edge-s
 </p>
 where the Jacobian $\( \partial M / \partial H \)$ captures matching-induced removals (e.g., deleting $|H_t|$ edges/vertices, altering future compatibilities).
 
-This propagation deregulates inclusion probabilities $\( P(\vartheta_i \in \mathcal{L}; \theta) \)$ across the horizon: for a trajectory \( \vartheta_i \) at $t=19$, its weight shifts by $\( \Delta P \propto \sum_{k=1}^{18} \mathrm{Cov}(\nabla_\theta \log P_F(H_k), \log q_{19}) \)$, implicitly reweighting all downstream losses. Mathematically, the gradient estimator under this non-stationarity becomes:
+This propagation deregulates inclusion probabilities $\( P(\vartheta_i \in \mathcal{L}; \theta) \)$ across the horizon: for a trajectory \( \vartheta_i \) at $t=19$, its weight shifts by <p align="center">
+  <img src="https://latex.codecogs.com/svg.latex?\Delta%20P%20\propto%20\sum_{k=1}^{18}%20\mathrm{Cov}\!\Big(\nabla_{\theta}\log%20P_F(H_k),\;\log%20q_{19}\Big)" 
+       alt="Gradient covariance equation">
+</p>
+implicitly reweighting all downstream losses. Mathematically, the gradient estimator under this non-stationarity becomes:
 
 <p align="center">
   <img src="https://latex.codecogs.com/png.latex?%5Cnabla_%5Ctheta%20L_%7B%5Cmathrm%7BTB%7D%7D%20%3D%20%5Cmathbb%7BE%7D_%7B%5Ctau%20%5Csim%20P_F%28%5Ccdot%3B%20%5Ctheta%29%7D%20%5Cleft%5B%20%5Cnabla_%5Ctheta%20%5Clog%20P_F%28%5Ctau%29%20%5Ccdot%20%5Cleft%28%20%5Clog%20Z%28%5Ctheta%29%20%2B%20%5Csum%20%5Clog%20P_F%20-%20%5Clog%20R%20-%20%5Csum%20%5Clog%20P_B%20%5Cright%29%20%2B%20%5Clambda%28%5Ctheta%29%20%5Cright%5D%2C" 
