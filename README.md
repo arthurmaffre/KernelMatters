@@ -70,7 +70,7 @@ To derive the positivity bound explicitly: note that $\( \mathcal{H}[G_t \mid \c
 Delving deeper into optimization dynamics, the TB objective—a local proxy for flow consistency—assumes stationary state sampling, but intertemporal dependencies render the effective data distribution 
 
 <p align="center">
-  <img src="https://latex.codecogs.com/png.latex?\mu(G_t;\theta)%20=%20\int%20q_{t-1}(G_{t-1};\theta)\,M(G_t%20\mid%20G_{t-1},P_F(\cdot%20\mid%20G_{t-1};\theta))\,dG_{t-1}" 
+  <img src="https://latex.codecogs.com/png.latex?q_t(G_t;\theta)%20=%20\int%20q_{t-1}(G_{t-1};\theta)\,M(G_t%20\mid%20G_{t-1},P_F(\cdot%20\mid%20G_{t-1};\theta))\,dG_{t-1}" 
        alt="Recursive mean field equation">
 </p>
 
